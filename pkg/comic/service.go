@@ -23,7 +23,14 @@ func NewComicService(r ComicRepository) ComicService {
 }
 
 func (s *service) GetOne(id int) (*Comic, error) {
-	return s.r.GetOne(id)
+	comic, err := s.r.GetOne(id)
+
+	if err != nil {
+		return nil, errors.Wrap(ErrComicNotFound, "service.Comic.GetOne")
+	}
+
+	return comic, nil
+
 }
 
 func (s *service) GetAll() ([]*Comic, error) {

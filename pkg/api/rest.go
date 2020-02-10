@@ -7,6 +7,7 @@ import (
 
 	"github.com/alexander-bautista/marvel/pkg/comic"
 	"github.com/gin-gonic/gin"
+	"github.com/pkg/errors"
 )
 
 type handler struct {
@@ -18,9 +19,12 @@ func NewHandler(c comic.ComicService) http.Handler {
 
 	router := gin.Default()
 
-	router.GET("/", h.GetAll)
-	router.GET("/:id", h.GetOne)
-	router.GET("/:id/estimatedTaxes", h.EstimatedTaxes)
+	v1 := router.Group("/api/comics")
+	{
+		v1.GET("/", h.GetAll)
+		v1.GET("/:id", h.GetOne)
+		v1.GET("/:id/estimatedTaxes", h.EstimatedTaxes)
+	}
 
 	return router
 }
@@ -34,13 +38,18 @@ func (h *handler) GetOne(c *gin.Context) {
 		return
 	}
 
-	comic, err := h.comicService.GetOne(int(id))
+	result, err := h.comicService.GetOne(int(id))
 
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"message": fmt.Sprintf("Cannot find comic with id %s", idParam)})
+		if errors.Cause(err) == comic.ErrComicNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"message": fmt.Sprintf("Cannot find comic with id %s", idParam)})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{})
+		return
 	}
 
-	c.JSON(http.StatusOK, comic)
+	c.JSON(http.StatusOK, result)
 }
 
 func (h *handler) GetAll(c *gin.Context) {
