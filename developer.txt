@@ -1,0 +1,6 @@
+# TEST
+# create a coverage file
+go test -coverprofile=cover.txt
+
+# export coverage file to a html
+go tool cover -html=cover.txt -o cover.html

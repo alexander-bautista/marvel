@@ -1,0 +1,13 @@
+mode: set
+github.com/alexander-bautista/marvel/pkg/comic/model.go:24.52,26.33 1 1
+github.com/alexander-bautista/marvel/pkg/comic/model.go:32.2,32.12 1 1
+github.com/alexander-bautista/marvel/pkg/comic/model.go:26.33,27.29 1 1
+github.com/alexander-bautista/marvel/pkg/comic/model.go:27.29,29.4 1 1
+github.com/alexander-bautista/marvel/pkg/comic/service.go:21.54,23.2 1 0
+github.com/alexander-bautista/marvel/pkg/comic/service.go:25.50,28.16 2 0
+github.com/alexander-bautista/marvel/pkg/comic/service.go:32.2,32.19 1 0
+github.com/alexander-bautista/marvel/pkg/comic/service.go:28.16,30.3 1 0
+github.com/alexander-bautista/marvel/pkg/comic/service.go:36.46,38.2 1 0
+github.com/alexander-bautista/marvel/pkg/comic/service.go:40.59,43.16 2 0
+github.com/alexander-bautista/marvel/pkg/comic/service.go:47.2,47.36 1 0
+github.com/alexander-bautista/marvel/pkg/comic/service.go:43.16,45.3 1 0

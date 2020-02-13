@@ -1,7 +1,5 @@
 package comic
 
-import "fmt"
-
 // Comic :  comic model
 type Comic struct {
 	Id     int     `json:"id"`
@@ -9,7 +7,7 @@ type Comic struct {
 	Isbn   string  `json:"isbn,omitempty"`
 	Format string  `json:"format,omitempty"`
 	Dates  []date  `json:"dates"`
-	Prices []price `json:"prices"`
+	Prices []Price `json:"prices"`
 	Qty    int     `json:"quantity"`
 }
 
@@ -18,7 +16,7 @@ type date struct {
 	Date string `json:"date"`
 }
 
-type price struct {
+type Price struct {
 	Type  string  `json:"type"`
 	Price float32 `json:"price"`
 }
@@ -34,6 +32,6 @@ func (comic *Comic) EstimatedTaxes() (tax float32) {
 	return tax
 }
 
-func (comic Comic) String() string {
+/*func (comic Comic) String() string {
 	return fmt.Sprintf("Comic %s %s. Quantity %d", comic.Title, comic.Format, comic.Qty)
-}
+}*/
