@@ -7,7 +7,7 @@ import (
 type ComicService interface {
 	GetOne(id int) (*Comic, error)
 	GetAll() ([]*Comic, error)
-	CalculateTaxes(id int) (float32, error)
+	CalculateTaxes(id int) (float64, error)
 }
 
 var (
@@ -37,7 +37,7 @@ func (s *service) GetAll() ([]*Comic, error) {
 	return s.r.GetAll()
 }
 
-func (s *service) CalculateTaxes(id int) (float32, error) {
+func (s *service) CalculateTaxes(id int) (float64, error) {
 	comic, err := s.r.GetOne(id)
 
 	if err != nil {

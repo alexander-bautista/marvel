@@ -18,14 +18,14 @@ type date struct {
 
 type Price struct {
 	Type  string  `json:"type"`
-	Price float32 `json:"price"`
+	Price float64 `json:"price"`
 }
 
 const (
 	TaxOverPrintPrice = 0.1
 )
 
-func (comic *Comic) EstimatedTaxes() (tax float32) {
+func (comic *Comic) EstimatedTaxes() (tax float64) {
 
 	for _, t := range comic.Prices {
 		if t.Type == "printPrice" {
