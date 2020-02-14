@@ -4,8 +4,8 @@ import (
 	"testing"
 )
 
-func Test_keyOp_Generate(t *testing.T) {
-
+func TestGenerate(t *testing.T) {
+	// This is like a table test
 	type args struct {
 		x int
 		y int
@@ -42,7 +42,7 @@ func Test_keyOp_Generate(t *testing.T) {
 	}
 }
 
-func Test_keyOp_Degenerate(t *testing.T) {
+func TestDegenerate(t *testing.T) {
 
 	type args struct {
 		s string
@@ -67,7 +67,7 @@ func Test_keyOp_Degenerate(t *testing.T) {
 			args: args{
 				s: "4099",
 			},
-			wantErr: true,
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {

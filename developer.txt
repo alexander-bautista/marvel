@@ -1,5 +1,8 @@
 # TEST
 
+# test all cases (asuming on root folder)
+go test ./...
+
 #check for race conditions
 go test -race
 
