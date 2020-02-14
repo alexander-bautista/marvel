@@ -1,6 +1,12 @@
 # TEST
+
+#check for race conditions
+go test -race
+
+#skip heavy test, specially for development only
+go test -skislow 
+
 # create a coverage file
 go test -coverprofile=cover.txt
-
 # export coverage file to a html
 go tool cover -html=cover.txt -o cover.html
