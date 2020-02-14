@@ -21,11 +21,15 @@ type Price struct {
 	Price float32 `json:"price"`
 }
 
+const (
+	TaxOverPrintPrice = 0.1
+)
+
 func (comic *Comic) EstimatedTaxes() (tax float32) {
 
 	for _, t := range comic.Prices {
 		if t.Type == "printPrice" {
-			tax += t.Price * 0.1
+			tax += t.Price * TaxOverPrintPrice
 		}
 	}
 	// Another price types sums 0 on taxes
