@@ -16,7 +16,12 @@ type TestComicData struct {
 
 func TestEstimatedTaxes(t *testing.T) {
 
-	const tolerance = .00001
+	/*
+		Approximate equality for floats can be handled by defining a custom comparer on floats that determines two values to be equal
+		if they are within some range of each other.
+	*/
+
+	tolerance := .00001
 	opt := cmp.Comparer(func(x, y float64) bool {
 		delta := math.Abs(x - y)
 		mean := math.Abs(x+y) / 2.0
@@ -25,7 +30,7 @@ func TestEstimatedTaxes(t *testing.T) {
 			return true
 		}
 
-		return delta/mean < tolerance
+		return (delta / mean) < tolerance
 	})
 
 	tests := []TestComicData{
@@ -35,14 +40,14 @@ func TestEstimatedTaxes(t *testing.T) {
 				Id: 1,
 				Prices: []comic.Price{
 					{
-						Type: "printPrice", Price: 10.45,
+						Type: "printPrice", Price: 10,
 					},
 					{
-						Type: "printPrice", Price: 20.65,
+						Type: "printPrice", Price: 20,
 					},
 				},
 			},
-			want: (10.45 + 20.65) * comic.TaxOverPrintPrice,
+			want: (10 + 20) * comic.TaxOverPrintPrice,
 		},
 		{
 			name: "sucess with large prices",
@@ -50,14 +55,11 @@ func TestEstimatedTaxes(t *testing.T) {
 				Id: 2,
 				Prices: []comic.Price{
 					{
-						Type: "printPrice", Price: 15456987,
-					},
-					{
-						Type: "printPrice", Price: 5699982348,
+						Type: "printPrice", Price: 15456987.40,
 					},
 				},
 			},
-			want: (15400000 + 5699982348) * comic.TaxOverPrintPrice,
+			want: (15456997.40) * comic.TaxOverPrintPrice,
 		},
 		{
 			name: "should return zero if no prices",
@@ -86,15 +88,15 @@ func TestEstimatedTaxes(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.comic.EstimatedTaxes(); !cmp.Equal(got, tt.want, opt) {
+				//got := tt.comic.EstimatedTaxes()
+				//if diff := math.Abs(got - tt.want); diff > tolerance {
+
 				t.Errorf("EstimatedTaxes FAILED, want %f, got %f", tt.want, got)
 			} else {
+				//t.Log("got: want"got)
+
 				t.Logf("EstimatedTaxes PASSED, want %f, got %f", tt.want, got)
 			}
 		})
 	}
 }
-
-/*
-Approximate equality for floats can be handled by defining a custom comparer on floats that determines two values to be equal
-if they are within some range of each other.
-*/

@@ -22,7 +22,7 @@ type Price struct {
 }
 
 const (
-	TaxOverPrintPrice = 0.1
+	TaxOverPrintPrice float64 = 0.1
 )
 
 func (comic *Comic) EstimatedTaxes() (tax float64) {

@@ -67,7 +67,7 @@ func TestDegenerate(t *testing.T) {
 			args: args{
 				s: "4099",
 			},
-			wantErr: false,
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
@@ -82,7 +82,7 @@ func TestDegenerate(t *testing.T) {
 				t.Errorf("keyOp.Degenerate() gotX = %v, wantX %v", gotX, tt.wantX)
 			}
 			if gotY != tt.wantY {
-				t.Errorf("keyOp.Degenerate() gotY = %v, wantX %v", gotY, tt.wantY)
+				t.Errorf("keyOp.DegeneraZte() gotY = %v, wantX %v", gotY, tt.wantY)
 			}
 		})
 	}
