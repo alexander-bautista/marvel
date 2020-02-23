@@ -9,16 +9,16 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/alexander-bautista/marvel/pkg/comic"
+	"github.com/alexander-bautista/marvel/pkg/character"
 )
 
-type comicMongoRepository struct {
+type characterMongoRepository struct {
 	client  *mongo.Client
 	timeout time.Duration
 }
 
-func NewMongoComicRepository(timeout int, client *mongo.Client) (comic.ComicRepository, error) {
-	repo := &comicMongoRepository{
+func NewMongoCharacterRepository(timeout int, client *mongo.Client) (character.CharacterRepository, error) {
+	repo := &characterMongoRepository{
 		client:  client,
 		timeout: time.Duration(timeout) * time.Second,
 	}
@@ -26,23 +26,23 @@ func NewMongoComicRepository(timeout int, client *mongo.Client) (comic.ComicRepo
 	return repo, nil
 }
 
-func (r *comicMongoRepository) GetOne(id int) (comic *comic.Comic, err error) {
+func (r *characterMongoRepository) GetOne(id int) (character *character.Character, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), r.timeout)
 
 	defer cancel()
 
-	collection := r.client.Database("todo").Collection("comics")
+	collection := r.client.Database("todo").Collection("characters")
 
-	err = collection.FindOne(ctx, bson.M{"id": id}).Decode(&comic)
+	err = collection.FindOne(ctx, bson.M{"id": id}).Decode(&character)
 
 	if err != nil {
-		return nil, errors.Wrap(err, "repository.Comic.GetOne")
+		return nil, errors.Wrap(err, "repository.Character.GetOne")
 	}
 
-	return comic, err
+	return character, err
 }
 
-func (r *comicMongoRepository) GetAll() ([]*comic.Comic, error) {
+func (r *characterMongoRepository) GetAll() ([]*character.Character, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), r.timeout)
 
 	defer cancel()
@@ -50,16 +50,16 @@ func (r *comicMongoRepository) GetAll() ([]*comic.Comic, error) {
 	opts := options.Find()
 	//opts.SetLimit(20)
 
-	collection := r.client.Database("todo").Collection("comics")
+	collection := r.client.Database("todo").Collection("characters")
 
 	cursor, _ := collection.Find(ctx, bson.M{}, opts)
 
 	defer cursor.Close(ctx)
 
-	items := make([]*comic.Comic, 0)
+	items := make([]*character.Character, 0)
 
 	for cursor.Next(ctx) {
-		oneItem := &comic.Comic{}
+		oneItem := &character.Character{}
 		err := cursor.Decode(&oneItem)
 
 		if err != nil {
