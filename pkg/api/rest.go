@@ -5,31 +5,40 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/alexander-bautista/marvel/pkg/character"
 	"github.com/alexander-bautista/marvel/pkg/comic"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 )
 
 type handler struct {
-	comicService comic.ComicService
+	comicService     comic.ComicService
+	characterService character.CharacterService
 }
 
-func NewHandler(c comic.ComicService) http.Handler {
-	h := &handler{c}
+func NewHandler(c comic.ComicService, ch character.CharacterService) http.Handler {
+	h := &handler{c, ch}
 
 	router := gin.Default()
 
 	v1 := router.Group("/api/comics")
 	{
-		v1.GET("/", h.GetAll)
-		v1.GET("/:id", h.GetOne)
-		v1.GET("/:id/estimatedTaxes", h.EstimatedTaxes)
+		v1.GET("/", h.GetAllComics)
+		v1.GET("/:id", h.GetOneComic)
+		v1.GET("/:id/estimatedTaxes", h.ComicEstimatedTaxes)
+	}
+
+	v2 := router.Group("/api/characters")
+	{
+		v2.GET("/", h.GetAllCharacters)
+		v2.GET("/:id", h.GetOneCharacter)
+		v2.GET("/:id/scream", h.CharacterScream)
 	}
 
 	return router
 }
 
-func (h *handler) GetOne(c *gin.Context) {
+func (h *handler) GetOneComic(c *gin.Context) {
 	idParam := c.Param("id")
 
 	id, err := strconv.Atoi(idParam)
@@ -52,7 +61,7 @@ func (h *handler) GetOne(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
-func (h *handler) GetAll(c *gin.Context) {
+func (h *handler) GetAllComics(c *gin.Context) {
 	// Get query  parameters.
 	dateRange := c.Query("dateRange")
 	titleStartsWith := c.Query("titleStartsWith")
@@ -72,7 +81,7 @@ func (h *handler) GetAll(c *gin.Context) {
 	c.JSON(http.StatusOK, comics)
 }
 
-func (h *handler) EstimatedTaxes(c *gin.Context) {
+func (h *handler) ComicEstimatedTaxes(c *gin.Context) {
 	idParam := c.Param("id")
 
 	id, err := strconv.Atoi(idParam)
@@ -88,4 +97,64 @@ func (h *handler) EstimatedTaxes(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, taxes)
+}
+
+func (h *handler) GetOneCharacter(c *gin.Context) {
+	idParam := c.Param("id")
+
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("%s is not a valid parameter", idParam)})
+		return
+	}
+
+	result, err := h.characterService.GetOne(int(id))
+
+	if err != nil {
+		if errors.Cause(err) == comic.ErrComicNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"message": fmt.Sprintf("Cannot find comic with id %s", idParam)})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{})
+		return
+	}
+
+	c.JSON(http.StatusOK, result)
+}
+
+func (h *handler) GetAllCharacters(c *gin.Context) {
+	chars, err := h.characterService.GetAll()
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, chars)
+}
+
+func (h *handler) CharacterScream(c *gin.Context) {
+	idParam := c.Param("id")
+
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("%s is not a valid parameter", idParam)})
+		return
+	}
+
+	// Get query  parameters.
+	what := c.Query("what")
+
+	if len(what) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Must provide a what parameter"})
+		return
+	}
+
+	scream, err := h.characterService.Scream(int(id), what)
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": fmt.Sprintf("Cannot find item with id %s", idParam)})
+	}
+
+	c.JSON(http.StatusOK, scream)
 }
