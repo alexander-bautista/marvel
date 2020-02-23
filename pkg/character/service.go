@@ -7,7 +7,7 @@ import (
 type CharacterService interface {
 	GetOne(id int) (*Character, error)
 	GetAll() ([]*Character, error)
-	Scream(string) string, error
+	Scream(int, string) (string, error)
 }
 
 var (
@@ -18,11 +18,11 @@ type service struct {
 	r CharacterRepository
 }
 
-func NewCharacterService(r CharacterRepository) {
+func NewCharacterService(r CharacterRepository) CharacterService {
 	return &service{r}
 }
 
-func (s *service) GetOne(int id) (*Character, error) {
+func (s *service) GetOne(id int) (*Character, error) {
 	char, err := s.r.GetOne(id)
 
 	if err != nil {
@@ -32,16 +32,18 @@ func (s *service) GetOne(int id) (*Character, error) {
 	return char, nil
 }
 
-func (s *service) GetaAll() ([]*Character, error) {
+func (s *service) GetAll() ([]*Character, error) {
 	return s.r.GetAll()
 }
 
-func (s *service) Scream(id int, what string) string {
+func (s *service) Scream(id int, what string) (string, error) {
 	char, err := s.r.GetOne(id)
 
 	if err != nil {
-		return nil, errors.Wrap(ErrCharacterNotFound, "service.Character.Scream")
+		return "", errors.Wrap(ErrCharacterNotFound, "service.Character.Scream")
 	}
 
-	return char.Scream(what), nil
+	scream := char.Scream(what)
+
+	return scream, nil
 }

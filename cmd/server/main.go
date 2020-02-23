@@ -10,14 +10,40 @@ import (
 	"time"
 
 	rest "github.com/alexander-bautista/marvel/pkg/api"
+	"github.com/alexander-bautista/marvel/pkg/character"
 	"github.com/alexander-bautista/marvel/pkg/comic"
 	"github.com/alexander-bautista/marvel/pkg/repository/mongo"
 )
 
 func main() {
-	repo := chooseRepo()
-	service := comic.NewComicService(repo)
-	handler := rest.NewHandler(service)
+	mongoTimeout, _ := strconv.Atoi(os.Getenv("MONGO_TIMEOUT"))
+
+	if mongoTimeout == 0 {
+		mongoTimeout = 10
+	}
+
+	client, err := mongo.NewMongoClient()
+
+	defer client.Disconnect(context.Background())
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	comicRepo, err := mongo.NewMongoComicRepository(mongoTimeout, client)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	characterRepo, err := mongo.NewMongoCharacterRepository(mongoTimeout, client)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	comicService := comic.NewComicService(comicRepo)
+	characterService := character.NewCharacterService(characterRepo)
+	handler := rest.NewHandler(comicService, characterService)
 
 	srv := &http.Server{
 		Addr:    ":8080",
@@ -53,31 +79,5 @@ func main() {
 
 	//Disconnect(ctx, col)
 	log.Println("Server exiting")
-
-}
-
-func chooseRepo() comic.ComicRepository {
-	mongoURL := os.Getenv("MONGO_URL")
-	if mongoURL == "" {
-		mongoURL = "mongodb+srv://todo_user:todo2020@traffic-nkwxe.mongodb.net/todo?retryWrites=true&w=majority"
-	}
-	mongodb := os.Getenv("MONGO_DB")
-	if mongodb == "" {
-		mongodb = "todo"
-	}
-
-	mongoTimeout, _ := strconv.Atoi(os.Getenv("MONGO_TIMEOUT"))
-
-	if mongoTimeout == 0 {
-		mongoTimeout = 10
-	}
-
-	repo, err := mongo.NewMongoRepository(mongoURL, mongodb, mongoTimeout)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return repo
 
 }
