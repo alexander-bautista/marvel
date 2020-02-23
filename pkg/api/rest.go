@@ -33,6 +33,7 @@ func NewHandler(c comic.ComicService, ch character.CharacterService) http.Handle
 		v2.GET("/", h.GetAllCharacters)
 		v2.GET("/:id", h.GetOneCharacter)
 		v2.GET("/:id/scream", h.CharacterScream)
+		v2.POST("/", h.CharacterAdd)
 	}
 
 	return router
@@ -156,5 +157,25 @@ func (h *handler) CharacterScream(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"message": fmt.Sprintf("Cannot find item with id %s", idParam)})
 	}
 
-	c.JSON(http.StatusOK, scream)
+	c.JSON(http.StatusOK, gin.H{"message": scream})
+}
+
+func (h *handler) CharacterAdd(c *gin.Context) {
+	var char character.Character
+
+	err := c.BindJSON(&char)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "body mismatch"})
+		return
+	}
+
+	result, err := h.characterService.Add(&char)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, result)
 }

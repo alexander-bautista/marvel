@@ -71,3 +71,20 @@ func (r *characterMongoRepository) GetAll() ([]*character.Character, error) {
 
 	return items, nil
 }
+
+func (r *characterMongoRepository) Add(char *character.Character) (interface{}, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), r.timeout)
+
+	defer cancel()
+
+	collection := r.client.Database("todo").Collection("characters")
+
+	result, err := collection.InsertOne(ctx, char)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "repository.Character.Add")
+	}
+
+	return result.InsertedID, nil
+
+}

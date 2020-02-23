@@ -1,5 +1,7 @@
 package character
 
+import "fmt"
+
 type Character struct {
 	Id          int
 	Name        string
@@ -8,5 +10,5 @@ type Character struct {
 }
 
 func (c *Character) Scream(what string) string {
-	return "!!!! Scream " + what
+	return fmt.Sprintf("%s scream %s", c.Name, what)
 }
